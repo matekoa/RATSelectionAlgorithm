@@ -1,0 +1,11 @@
+Meriem Kassar, Brigitte Kervella, Guy Pujolle,
+An overview of vertical handover decision strategies in heterogeneous wireless networks,
+Computer Communications,
+Volume 31, Issue 10,
+2008,
+Pages 2607-2620,
+ISSN 0140-3664,
+https://doi.org/10.1016/j.comcom.2008.01.044.
+(https://www.sciencedirect.com/science/article/pii/S0140366408000492)
+Abstract: In the next generation of wireless networks, mobile users can move between heterogeneous networks, using terminals with multiple access interfaces and non-real-time or real-time services. The most important issue in such environment is the Always Best Connected (ABC) concept allowing the best connectivity to applications anywhere at anytime. To answer ABC requirement, various vertical handover decision strategies have been proposed in the literature recently, using advanced tools and proven concepts. In this paper, we give an overview of the most interesting and recent strategies. We classify it into five categories for which we present their main characteristics. We also compare each one with the others in order to introduce our vertical handover decision approach.
+Keywords: Vertical handover; Heterogeneous wireless networks; Handover decision; Strategy; Network selection

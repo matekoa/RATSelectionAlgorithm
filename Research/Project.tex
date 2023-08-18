@@ -1,0 +1,1351 @@
+% This LaTeX was auto-generated from MATLAB code.
+% To make changes, update the MATLAB code and export to LaTeX again.
+
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{epstopdf}
+\usepackage[table]{xcolor}
+\usepackage{matlab}
+
+\sloppy
+\epstopdfsetup{outdir=./}
+\graphicspath{ {./Project_images/} }
+
+\begin{document}
+
+\matlabtitle{Algorithm Design For Making Handover Decisions in Heterogeneous Wireless Networks}
+
+
+\vspace{1em}
+\matlabheading{User Defined Weights}
+
+\begin{par}
+\begin{flushleft}
+The table randomly assigns weights to each criteria picked by the user.
+\end{flushleft}
+\end{par}
+
+\begin{matlabcode}
+% create table with column names
+U = table('Size',[1000,3],'VariableNames',{'cost','datarate','delay'}, 'VariableTypes',{'uint8','uint8','uint8'});
+
+% generate random values for each term
+U.datarate = randi([1,10],1000,1); % random integer between 1 and 10
+U.cost = randi([1,10], 1000, 1); % random decimal between 0 and 10
+U.delay = randi([1,10],1000,1); % random integer between 10 and 10
+
+% create table with column names
+U1 = table('Size',[1000,3],'VariableNames',{'cost','datarate','delay'}, 'VariableTypes',{'uint8','uint8','uint8'});
+
+% generate random values for each term
+U1.datarate = randi([1,5], 1000, 1);
+U1.cost = randi([9,10],1000,1);
+U1.delay = randi([1,5], 1000, 1);
+% create table with column names
+U2 = table('Size',[1000,3],'VariableNames',{'cost','datarate','delay'}, 'VariableTypes',{'uint8','uint8','uint8'});
+
+% generate random values for each term
+U2.datarate = randi([5,10],1000,1); % random integer between 1 and 10
+U2.cost = randi([1,10], 1000, 1); % random decimal between 0 and 10
+U2.delay = randi([1,10], 1000, 1); % random integer between 10 and 10
+
+U3 = table('Size',[1000,3],'VariableNames',{'cost','datarate','delay'}, 'VariableTypes',{'uint8','uint8','uint8'});
+
+% generate random values for each term
+U3.datarate = randi([1,10], 1000, 1); % random integer between 1 and 10
+U3.cost = randi([1,10], 1000, 1); % random decimal between 0 and 10
+U3.delay = randi([5,10],1000,1); % random integer between 10 and 10
+
+
+%Convert Table To Matrix
+A = table2array(U);
+A1 = table2array(U1);
+A2 = table2array(U2);
+A3 = table2array(U3);
+
+%Empty Matrix for normalization
+B = zeros(1000,3);
+B1 = zeros(1000,3);
+B2 = zeros(1000,3);
+B3 = zeros(1000,3);
+\end{matlabcode}
+
+\matlabheading{Available RATs and RAT-selection Criteria}
+
+\begin{par}
+\begin{flushleft}
+There are 3 available RATs namely, 3G, WLAN and 5G. Criteria to be used is Price per MB, Available Datarate, Delay
+\end{flushleft}
+\end{par}
+
+\matlabheading{Construction Of The Decision Matrix}
+
+\begin{matlabcode}
+% generate random values for each term
+rat_type = {'3G';'WLAN'; '5G'};
+R_datarate = [3;50;100];% Mbps
+R_cost = [0.15;0.19;0.5];%Cost in R per MB
+R_delay = [100;60;5]; %Latency in ms
+
+% create table with column names
+R = table(rat_type, R_cost,R_datarate,R_delay);
+
+D_rat = [R_cost R_datarate R_delay];
+
+%Empty Matrix For Normalization
+E = zeros(3,3);
+
+\end{matlabcode}
+
+\matlabheading{Normalizing Data}
+
+\begin{par}
+\begin{flushleft}
+Datarate and Delay = Benefit Attributes
+\end{flushleft}
+\end{par}
+
+\begin{par}
+\begin{flushleft}
+Cost = Cost Attribute
+\end{flushleft}
+\end{par}
+
+\matlabheadingtwo{Normalizing Benefit Attributes}
+
+\begin{matlabcode}
+[row, col] = size(A);
+
+%Decision Matrix
+[r_row, r_col] = size(D_rat);
+
+%Datarate
+for i = 1:r_row
+   E(i,2) = D_rat(i,2) / max(D_rat(:,2));
+end
+
+%Delay
+for i = 1:r_row
+   E(i,3) = min(D_rat(:,3)) / D_rat(i,3);
+end
+
+\end{matlabcode}
+
+\matlabheadingtwo{Normalizing Cost Attributes}
+
+\begin{matlabcode}
+
+%Decision Matrix
+for i = 1:r_row
+   E(i,1) = min(D_rat(:,1)) / D_rat(i,1);
+end
+
+%Normalizing Cost attributes
+\end{matlabcode}
+
+\matlabheading{Normalise User Weights}
+
+\begin{matlabcode}
+%test
+for i = 1:row
+    for j = 1:col
+        B(i,j) = A(i,j)/sum(A(i,:));
+        B1(i,j) = A1(i,j)/sum(A3(i,:));
+        B2(i,j) = A2(i,j)/sum(A3(i,:));
+        B3(i,j) = A3(i,j)/sum(A3(i,:));
+    end
+end
+\end{matlabcode}
+
+\matlabheading{Display Normalized Matrices}
+
+\begin{matlabcode}
+disp(U)
+\end{matlabcode}
+\begin{matlaboutput}
+    cost    datarate    delay
+    ____    ________    _____
+
+      6         2         6  
+     10         1        10  
+     10         4        10  
+      4         1         1  
+      9         2         3  
+      9         2         1  
+      7         7         7  
+      1         9         5  
+      3         2         5  
+      1         9         5  
+      5         3         8  
+      2         5         6  
+      3         7         7  
+      4         7         7  
+      6        10         7  
+      6         5        10  
+      7        10         5  
+      6         2         4  
+      1         2         7  
+      5         5         9  
+      6         8         8  
+      2         7         8  
+      1         9         7  
+     10         8         8  
+      1         4         8  
+      2         1        10  
+      6        10         3  
+      1         2         5  
+      2         7         5  
+      9         9         2  
+      1         7         7  
+     10         5         7  
+      9         4         1  
+      4         1         5  
+      9         1         6  
+      7         2         6  
+      7         1         3  
+      1         7         8  
+      4         3         2  
+      8         3        10  
+      3         8         3  
+      5         4         8  
+      4         2         6  
+      3         4         6  
+      9         9         6  
+      7         8         6  
+      1         2         2  
+      6         6         7  
+      3         4         1  
+     10         7         5  
+      3         3         7  
+      5        10        10  
+      8         3         7  
+      5         8        10  
+      7         8         4  
+      9         9         2  
+      3        10        10  
+      6         3         5  
+      7        10         6  
+      5         4         3  
+     10         6         3  
+     10         1         8  
+     10         8         3  
+      5         3         4  
+      7         4         9  
+      2         2         4  
+      9         3         8  
+      1         3        10  
+      4         2         3  
+     10         5         7  
+      3         7         2  
+      3        10         9  
+      1         7         9  
+     10         7         4  
+      5         5         7  
+      2         3        10  
+      3         6         4  
+      6         7         8  
+     10         7         6  
+      8         4         7  
+      3         9         7  
+      7         8         9  
+      6         7         3  
+      7         7         6  
+      2         8         5  
+      1         2         5  
+      1        10         7  
+      4         8         6  
+      7         7         6  
+      6         1         8  
+      1         4         9  
+      2         9        10  
+      8         1         3  
+      2         7         4  
+      5         7         9  
+      9         5         4  
+      4         8         2  
+      2        10         7  
+      1         9         4  
+      2         8         4  
+      8         9         6  
+     10         8         9  
+      9         3         6  
+      5         4         8  
+     10         5         9  
+      8        10         5  
+      4         7         9  
+      6        10         5  
+      2         4         2  
+      9         5         7  
+      9         9         9  
+      2         3         3  
+      4         7         6  
+      4         1         7  
+      2         5        10  
+      4         6        10  
+      9         9         5  
+      9         9         2  
+      7         3         8  
+      9         1         5  
+      2         5         7  
+      2         5         9  
+      4        10         7  
+      2         3         3  
+      5         9         2  
+      7         2         9  
+      8         6         2  
+      4         3         7  
+      7         5         4  
+     10         7        10  
+     10         8         3  
+      8         7        10  
+     10         8         8  
+      1         1         6  
+     10         7         9  
+      6         2         8  
+      5         3        10  
+      3         7         4  
+      3         1         9  
+      6         3         8  
+      4         2         6  
+      5         1         2  
+     10         1         9  
+      6         8         6  
+      1         9         7  
+      9         5        10  
+      9         8         3  
+      1         8         4  
+     10         5         7  
+      3         9         3  
+      9         9         4  
+      8         8        10  
+      4         8         4  
+      7         7         3  
+      1         6         7  
+      4        10         6  
+      7         6        10  
+      2         2         5  
+      4         2         2  
+      1         5         1  
+     10         4         6  
+      5         6         6  
+      3         2         4  
+      9         6        10  
+      3         5         2  
+      3         6         3  
+      4         8        10  
+      7         3         1  
+      5         3         5  
+      9         3         1  
+      2         6         7  
+      7         7         9  
+      8         5         5  
+     10         7         8  
+      9         3         3  
+      3         4         8  
+      9        10         2  
+      8         1         4  
+      2         6         7  
+      2         4         3  
+      3         6         1  
+      6         8         7  
+      2         4         7  
+      3         1         9  
+      2         8         7  
+      1         9         1  
+      4         4         9  
+      5         3         2  
+     10         5         8  
+      8         1         3  
+     10         5        10  
+      8         3         1  
+      2         3         4  
+      4         9         7  
+      5        10         2  
+      6         5         1  
+      3         9         6  
+      9         3         8  
+      6         1         5  
+      5         3         7  
+      7         2         8  
+      2         3         7  
+      4        10         3  
+      4         5         1  
+      5         6         4  
+      4         2         9  
+      3         2         2  
+      1         1         3  
+      1         9         4  
+      3         9         2  
+      8         4         6  
+      5         7         3  
+      1         7         1  
+      3         4         3  
+      9         5         1  
+     10         7        10  
+      9         1         6  
+      3         5         7  
+      1         4        10  
+      6        10         1  
+      8         9         6  
+      7         6         1  
+      1         3         4  
+      8         5         7  
+      6         4         6  
+      2         8         8  
+      7         9         1  
+      8         1         5  
+      1         7         1  
+      2         9         3  
+      7         6         2  
+      3         1         7  
+      3         6         6  
+      5         2         4  
+      1         9         1  
+      8         9         3  
+      7         1        10  
+      6         4         3  
+      4         8         6  
+      5         6         8  
+      1         2         1  
+      1         8        10  
+      2        10         9  
+      3         7         3  
+      3         7         8  
+      3         7         7  
+      5         8         6  
+      3         4         3  
+      2         6         8  
+      6         6         3  
+     10         9         2  
+      6         8         6  
+      6         6         2  
+      5        10         2  
+      8         9         2  
+     10         7         5  
+      8         8         7  
+      9         9         9  
+      4         2        10  
+      1         7         2  
+      7        10         2  
+     10         4         7  
+      7         4         6  
+      9         9         2  
+      1         6         7  
+      6         2         9  
+      8         8         9  
+      6         4         1  
+      9         7         2  
+      5         5         9  
+     10         1         2  
+      3         5         1  
+      2         9         3  
+     10         9         9  
+      1         9         2  
+      6        10         5  
+      7         3         3  
+      2         9         8  
+      2        10         5  
+     10         3         8  
+      8         8         7  
+      6         1         7  
+      6         9         8  
+      2         9         9  
+      7        10        10  
+      5         8         7  
+      1         5         7  
+      8         2        10  
+      7         9         5  
+     10         9         6  
+      6         9         8  
+      6         2         9  
+      9         7         6  
+      7         8        10  
+      8         8         2  
+      9         7         7  
+      1         8         4  
+      4         4         7  
+      2         1         6  
+      8         6         5  
+      5         7         3  
+      2         3         7  
+      2        10         1  
+      3         5         2  
+      7         8        10  
+      5         8         8  
+      3         1         2  
+      6         5        10  
+      2         3        10  
+      8         6         8  
+      1         2         6  
+      2         7         4  
+      3         6         7  
+      8         9         3  
+      6        10         8  
+     10         6         2  
+     10         2        10  
+      5         4         9  
+      8         3         8  
+      4        10         7  
+      5         9         3  
+      1        10         2  
+      6         1         4  
+      5         2        10  
+      4         3         3  
+     10         2         2  
+      2         4        10  
+      4         3         5  
+     10         4         8  
+      5        10         2  
+      9         2         7  
+      2         4         8  
+      4         6         2  
+      8         2         9  
+      4         1         9  
+      7         9         9  
+      4         6         5  
+      4         4         5  
+      5         5         1  
+      4         2         6  
+     10         5         3  
+      1         1         1  
+      4         6        10  
+      3         1         5  
+      2         2         3  
+      5         1         5  
+      1         5         2  
+      1         9         1  
+      1         9         9  
+      5         2         7  
+      3         7         8  
+     10         9        10  
+      4         5         9  
+      3         3         3  
+      2        10         8  
+      8         3         4  
+      4         3         6  
+      7         2         4  
+      4         1         2  
+      2         7         5  
+      8         9         5  
+      8         7         3  
+      6         5         3  
+      9         8         4  
+      8         6         9  
+      6         6        10  
+      1         6         1  
+     10         1        10  
+      5         5         6  
+      8         1         9  
+      1         2         4  
+      9         5         8  
+      7         7         3  
+      5         7         9  
+      6         1         1  
+      3         2         2  
+      1        10         2  
+      5        10         1  
+     10         8         3  
+      5         8         6  
+      8         7         3  
+      2         4         3  
+      3         2         7  
+      5         4         9  
+      5         6         1  
+      4         7         6  
+      7         8         2  
+      4         7         3  
+      3         5         1  
+     10         8         7  
+      6        10         2  
+      3         5         7  
+      9         5         6  
+      2         6         8  
+     10         8         9  
+     10        10         5  
+      6         7         4  
+      4         5         1  
+      4         2         4  
+      2         3         9  
+      2         9         5  
+      3         7         2  
+      2         6         2  
+      4         9         8  
+      4         4         7  
+      6         2        10  
+      4         7         4  
+      6         4         8  
+      7         4         1  
+      8         6         5  
+      8         9         9  
+      9         8        10  
+      8         3         3  
+      8         9         7  
+      2         9         7  
+      9         4         9  
+      5         4         8  
+      4         2         6  
+      1        10         7  
+      8         3         9  
+      9         3         6  
+     10         5         2  
+      5         2         3  
+      1         6         2  
+      9         9        10  
+     10         6         1  
+      5         4         1  
+      1         2         6  
+      3         6         7  
+      2         2         1  
+     10         5         2  
+      6        10         4  
+      9         7         7  
+      7         7         9  
+      7         8         9  
+      7         9         8  
+      9         8         3  
+      1         6         6  
+      8         3        10  
+     10        10         4  
+     10        10         7  
+      4         8        10  
+      7         6         2  
+      8         2         5  
+      3         9         1  
+      9         1         6  
+      6         1         3  
+     10         1         4  
+      2         7         9  
+      7        10         2  
+      3         2         2  
+      5         9         9  
+      5         5         6  
+      9         8        10  
+      8         9         4  
+      7         1         9  
+      5        10         7  
+      4         6        10  
+      2         9         5  
+      1        10         8  
+      7         2         8  
+      5         6         5  
+      9         1         9  
+      3         5         8  
+     10        10         9  
+      1         2         5  
+     10         9        10  
+      8         8         2  
+      7         5         5  
+      9         2         7  
+      9         9         5  
+      1         9         9  
+      6         6         5  
+      4        10         5  
+      2         2         1  
+      4         7         7  
+      7         6         1  
+      7        10         3  
+      5         3         8  
+      7         6         2  
+      3         1         2  
+      5         1         7  
+     10         7         3  
+      3         5         3  
+      2         7         4  
+      4         3         4  
+     10         8         7  
+      8         8         3  
+      1         3         5  
+      3         4         5  
+      7         1        10  
+      6         9         7  
+      7         9         2  
+     10         1         7  
+      6         4         1  
+      7         3        10  
+      7         9         9  
+      1        10         9  
+      2         9         2  
+      5         1         1  
+      9         7         4  
+      1         8         3  
+      2         6         7  
+      3         6         5  
+      3         4         1  
+      3         7         3  
+      8         2         2  
+      1         3         2  
+      3         5         7  
+      1         9         8  
+      8         4         9  
+     10         8         4  
+      1         7         9  
+      1         2         3  
+      7         4         2  
+      2         3         8  
+      6         9         6  
+      2         2        10  
+      1         8         1  
+      9         4         7  
+      9         4         1  
+      8         2         6  
+      6         4         8  
+      2         6         7  
+      7         5         4  
+      1         6         1  
+      5         9         1  
+      8         5         4  
+      6         2         8  
+      6         4         6  
+      6         9         6  
+      7        10         9  
+     10         8         1  
+      8         5         4  
+      1         1         9  
+      1         9         6  
+     10         2         6  
+      1         5         5  
+      4         8         8  
+      6         8         6  
+      9         4         3  
+      2        10         9  
+      1         5         7  
+      1         2         1  
+      4         9         5  
+     10         6         6  
+      4         8         7  
+      6        10         6  
+      9         5         2  
+     10        10         1  
+      5         1         3  
+      4         8         2  
+      1         8        10  
+      1         4         5  
+      4        10         3  
+      2         9         8  
+      6         1         4  
+      3         4         4  
+      2        10         5  
+      3         2         8  
+      3         1         4  
+     10         5         8  
+      6         1         7  
+      6         2         2  
+      2         9         5  
+      7         5         8  
+      6        10         6  
+      4         3        10  
+      5         3        10  
+      2         1         2  
+      2         6         6  
+      3         6         6  
+      6         9         1  
+      3         8         1  
+      7         1         8  
+      5         2         4  
+     10         7         6  
+      9         2         7  
+     10         6         1  
+     10         6         7  
+      5         2         4  
+      5         8         3  
+      3        10         8  
+      1         9         5  
+      7         2         5  
+      3         1         5  
+      6         5         2  
+      6         2         7  
+      8         7        10  
+      2         1         1  
+      1         7         3  
+      8         4         8  
+      4         4         8  
+      3         3         1  
+      7         2         4  
+      8         3         4  
+      6         6         6  
+      3        10         2  
+      1         7         8  
+      4         5         1  
+      2         3         1  
+      4         1         2  
+      5        10        10  
+     10         3         1  
+      4         6         6  
+      2         1         5  
+      1         9         6  
+      2         9         7  
+      2        10         9  
+      8         6         2  
+      1         5        10  
+      4         6         6  
+      1         2         4  
+      9         3         8  
+     10         2         9  
+      5        10        10  
+      2         1         5  
+      1         7         9  
+     10         2         8  
+      4         8         8  
+      7         8         7  
+      8         9         8  
+      1         2        10  
+      7         5         6  
+      4         1         3  
+      4         1         5  
+      3         8         8  
+      2         9         2  
+     10         9         9  
+      1         3         5  
+      1         4         7  
+      4         3        10  
+      3         8         6  
+      8         6         1  
+      2         4         4  
+      2         4         1  
+      1         2         3  
+      3         4         3  
+      4         7         4  
+      8         7        10  
+     10         2         9  
+      8         3         3  
+      6         5         4  
+      7         1         2  
+      3         4         7  
+      3         2         3  
+      8         6         8  
+      6         7         4  
+      7         3         9  
+      7         8        10  
+      8         4         1  
+      7         6         1  
+     10        10         6  
+      5         5         7  
+      9         5         4  
+      3        10         6  
+      2         7         3  
+      7         7         3  
+      3         9         6  
+      5         1         5  
+      8         5         2  
+      1         6         9  
+      5         1         4  
+      6         1         2  
+      4         2         2  
+      8         3         7  
+      4         7        10  
+      1        10         2  
+      7        10         4  
+      7         6         9  
+      6         5         9  
+      4         4         3  
+      6         4         6  
+      9         3         1  
+      8         6         7  
+      3         2         9  
+      9         8         8  
+      9         2         1  
+      3         3        10  
+      5         5         8  
+      4         1         4  
+      5         1         9  
+      4         6         2  
+      6         6         1  
+      7         3         8  
+      7         9         1  
+      4         4        10  
+      5         6         8  
+      6         1        10  
+     10         7        10  
+      2         9         9  
+      3         1         2  
+      6         1         6  
+      6         6         7  
+      6         2         8  
+     10         7         6  
+      5         5         3  
+      3         9         5  
+      4         9         3  
+      1         7        10  
+     10         4         9  
+      8         2         4  
+      3         3        10  
+      7         1         3  
+      5         7         2  
+      4         4         2  
+      8         8         6  
+      3         3         4  
+      8         9         8  
+      7         3         4  
+      5         1         9  
+      5         2        10  
+      6        10         9  
+      8         3         5  
+      6         1         1  
+     10         2         7  
+      4         7        10  
+      4         2         7  
+     10         6        10  
+      8         5         3  
+      4         6         2  
+      6         8         3  
+      3         3         6  
+      6        10         7  
+      8         5         2  
+      6         5         1  
+      5         9         6  
+      9         8         7  
+      7         8         6  
+      9         7         9  
+      6         2         7  
+      6         9         8  
+      6         2         6  
+      5         5         8  
+      3         7        10  
+      6         1         1  
+     10         3         6  
+      7        10         7  
+      5         4         2  
+     10         7         9  
+      1         5         7  
+      6         4         5  
+     10         3         1  
+      4         2         6  
+      4         6         1  
+      2        10         4  
+     10         4         5  
+      9         3         1  
+      8        10         6  
+      8         7         6  
+      6        10         7  
+      7         9         8  
+      6         5         7  
+      6         3         5  
+      4         4         1  
+      5         5         1  
+      4         8         8  
+      4        10         2  
+      3         8         5  
+      7         6         5  
+      2         7         7  
+      9         7         5  
+     10         8         1  
+      9         3         7  
+      9         1         1  
+      1         7        10  
+      3         3         3  
+      3         1         9  
+      3         6         8  
+      4         4         5  
+      4         1         2  
+      1         6         8  
+      5         3         8  
+      1         3         8  
+      2         1         2  
+      4         4         4  
+      5         1         8  
+     10         9         6  
+      5         8         1  
+     10         7        10  
+      6         2         6  
+      4         3         6  
+      4        10         9  
+      7         8         5  
+      9        10         9  
+      4         7         7  
+      9         1        10  
+     10         3        10  
+      8         9         4  
+      2         7         7  
+      1         7         8  
+     10         2         2  
+      7         2         3  
+      5         8         8  
+      2         6         7  
+      6         6         9  
+      2         4        10  
+      7         4         5  
+      4         4         5  
+      8         4         2  
+     10         7         9  
+     10         9         9  
+      8        10         6  
+      2         3        10  
+      1         8         7  
+      4         5         3  
+     10         1         6  
+      4         4         1  
+     10         7        10  
+      2         1         3  
+      6         6         6  
+      4         1         6  
+      8         5         6  
+      5         1         6  
+     10         7         6  
+      1         3         6  
+      6         8        10  
+      7        10         4  
+      5         5         6  
+      7         5         2  
+      3         5         2  
+      4         9         4  
+      8         5         3  
+      7        10         3  
+      5         8         6  
+      7         5         5  
+      6         7         8  
+      8         5         3  
+      8         6        10  
+      4         3         7  
+     10         8         3  
+      6         2         5  
+      6         7         2  
+      1         4         1  
+      4         3        10  
+      6        10         3  
+      5         6         2  
+      7         4         2  
+      8         1         4  
+      2         8        10  
+      8         1         3  
+     10         8         3  
+      5         2        10  
+      1         5         9  
+      2         2         6  
+      7         4         4  
+      5         4         7  
+      9         7         2  
+      7        10         5  
+      9         8         2  
+      9         3         6  
+      8         2         4  
+      1         1         8  
+      6         3         5  
+      9         9        10  
+      1         7         8  
+      2         8         7  
+      5         8         8  
+      3         7         1  
+     10         4         9  
+      8         5         8  
+      5         2         4  
+     10         7         7  
+      9         2         9  
+      6         7         5  
+      4         8         6  
+     10         2         2  
+      4         5         3  
+      2         3        10  
+      3        10         8  
+      8         4         3  
+      8         2         4  
+      4         9         7  
+      7         5         3  
+      8         5         5  
+      6         6         7  
+      5        10         6  
+      4         3         9  
+      1         1         5  
+      6         6         7  
+      7         1         3  
+      2         9         5  
+      7         7         7  
+      1         3         4  
+      2         5         6  
+      3         1         3  
+      6        10         7  
+      5         1         4  
+      6         7         8  
+      2         8         2  
+      6         5         8  
+      7         1         1  
+     10         9         8  
+      7         2         8  
+      2        10         3  
+      3         1         8  
+      2         7         3  
+      3         3         3  
+      5         9        10  
+      8        10         3  
+      8         5         7  
+      4         6        10  
+      8         1         7  
+      5         3         4  
+      5         3         2  
+      5         6        10  
+      2         4         9  
+     10         8         7  
+      4        10         9  
+      8         1         2  
+      7         5         6  
+      6         5         4  
+      5         5         2  
+     10        10         1  
+      6         8         8  
+      1        10        10  
+      9         6         8  
+      6        10         4  
+      3         1         8  
+      4         1        10  
+     10         8         4  
+      1         6         6  
+      8        10        10  
+      1         4         1  
+      9         6         3  
+      5         7        10  
+      8         3         3  
+      5         2         4  
+      2        10         8  
+      7         3         3  
+      3         8         3  
+      9         3         4  
+      3         8         3  
+      5         1         5  
+      7         3         9  
+      6         8         6  
+      5         8         1  
+      2         2         7  
+      4         6         6  
+      3         7        10  
+      7         9         9  
+      6         8        10  
+      7         1        10  
+      6         1         7  
+      3         9         3  
+     10         7         8  
+      4         1         2  
+      2         3         8  
+      5         8         6  
+      9         3         8  
+      3         1         7  
+     10         3         9  
+      5         3         8  
+      9         8         1  
+     10        10        10  
+      8         3         3  
+      7         7         6  
+      6        10         3  
+      7         4        10  
+      4         8         5  
+      4         4         6  
+     10         3        10  
+      6         8         5  
+      3         9         5  
+      6         2         2  
+      9         1         7  
+      5         5         3  
+      8         8         7  
+      7         1         5  
+      8         2        10  
+      2         5         7  
+      6         3         3  
+     10         8         7  
+     10         8         3  
+      7         4         4  
+      6        10         4  
+      1         1         7  
+      9         3         5  
+      6         5         1  
+     10         9         6  
+      8         8         4  
+     10         4         6  
+      2         1        10  
+      7         5         7  
+      4         2         3  
+      4         9         7  
+      2        10         5  
+      5         9         6  
+      8         8         1  
+      1         1         5  
+      8         4         8  
+      3         6         5  
+      4         5        10  
+      5         6         8  
+      5        10         6  
+      9         8         6  
+      5         4         2  
+      3         9         9  
+      2        10         8  
+      1         8         7  
+\end{matlaboutput}
+\begin{matlabcode}
+disp(E)
+\end{matlabcode}
+\begin{matlaboutput}
+    1.0000    0.0300    0.0500
+    0.7895    0.5000    0.0833
+    0.3000    1.0000    1.0000
+\end{matlaboutput}
+
+\matlabheading{SAW (Simple Additive Weighting)}
+
+
+\vspace{1em}
+\begin{matlabcode}
+
+% Calculate the weighted sum
+s = zeros(row,col);
+s1 = zeros(row,col);
+s2 = zeros(row,col);
+s3 = zeros(row,col);
+for i = 1:row
+        %Random
+        s(i,1) = (B(i,1)*E(1,1))+ (B(i,2)*E(1,2)) + (B(i,3)*E(1,3));%RAT 1 Weights
+        s(i,2) = (B(i,1)*E(2,1))+ (B(i,2)*E(2,2)) + (B(i,3)*E(2,3));%RAT 2 Weights
+        s(i,3) = (B(i,1)*E(3,1))+ (B(i,2)*E(3,2)) + (B(i,3)*E(3,3));%RAT 3 Weights
+
+        %RAT1
+        s1(i,1) = (B1(i,1)*E(1,1))+ (B1(i,2)*E(1,2)) + (B1(i,3)*E(1,3));%RAT 1 Weights
+        s1(i,2) = (B1(i,1)*E(2,1))+ (B1(i,2)*E(2,2)) + (B1(i,3)*E(2,3));%RAT 2 Weights
+        s1(i,3) = (B1(i,1)*E(3,1))+ (B1(i,2)*E(3,2)) + (B1(i,3)*E(3,3));%RAT 3 Weights
+        %RAT2
+        s2(i,1) = (B2(i,1)*E(1,1))+ (B2(i,2)*E(1,2)) + (B2(i,3)*E(1,3));%RAT 1 Weights
+        s2(i,2) = (B2(i,1)*E(2,1))+ (B2(i,2)*E(2,2)) + (B2(i,3)*E(2,3));%RAT 2 Weights
+        s2(i,3) = (B2(i,1)*E(3,1))+ (B2(i,2)*E(3,2)) + (B2(i,3)*E(3,3));%RAT 3 Weights
+        %RAT3
+        s3(i,1) = (B3(i,1)*E(1,1))+ (B3(i,2)*E(1,2)) + (B3(i,3)*E(1,3));%RAT 1 Weights
+        s3(i,2) = (B3(i,1)*E(2,1))+ (B3(i,2)*E(2,2)) + (B3(i,3)*E(2,3));%RAT 2 Weights
+        s3(i,3) = (B3(i,1)*E(3,1))+ (B3(i,2)*E(3,2)) + (B3(i,3)*E(3,3));%RAT 3 Weights
+end
+
+
+\end{matlabcode}
+
+\matlabheading{Compare Weight Of RATs and Return Selected RAT}
+
+\begin{matlabcode}
+RAT1 = 0; %RAT1 Load
+RAT2 = 0;%RAT2 Load
+RAT3 = 0; %RAT3 Load
+
+for i = 1:row
+    if s(i,1) == max(s(i,:))
+        RAT1 = RAT1 +1;
+    elseif s(i,2)== max(s(i,:))
+        RAT2 = RAT2 +1;
+    else
+        RAT3 = RAT3 +1;
+    end
+end
+
+disp('RAT Selection When User weights are RANDOMIZED')
+\end{matlabcode}
+\begin{matlaboutput}
+RAT Selection When User weights are RANDOMIZED
+\end{matlaboutput}
+\begin{matlabcode}
+RATnames= categorical({'3G', 'WLAN', '5G'});
+RATnames= reordercats(RATnames,{'3G', 'WLAN', '5G'});
+y = [RAT1 RAT2 RAT3];
+bar(RATnames, y)
+\end{matlabcode}
+\begin{center}
+\includegraphics[width=\maxwidth{56.196688409433015em}]{figure_0.eps}
+\end{center}
+
+\matlabheading{Effect of Users Weight On RAT Selection for Criterion 1}
+
+\begin{matlabcode}
+RAT1 = 0; %RAT1 Load
+RAT2 = 0;%RAT2 Load
+RAT3 = 0; %RAT3 Load
+
+for i = 1:row
+    if s1(i,1) == max(s1(i,:))
+        RAT1 = RAT1 +1;
+    elseif s1(i,2)== max(s1(i,:))
+        RAT2 = RAT2 +1;
+    else
+        RAT3 = RAT3 +1;
+    end
+end
+
+disp('Effect of User Weights For Criterion 1')
+\end{matlabcode}
+\begin{matlaboutput}
+Effect of User Weights For Criterion 1
+\end{matlaboutput}
+\begin{matlabcode}
+RATnames= categorical({'3G', 'WLAN', '5G'});
+RATnames= reordercats(RATnames,{'3G', 'WLAN', '5G'});
+y = [RAT1 RAT2 RAT3];
+bar(RATnames, y)
+\end{matlabcode}
+\begin{center}
+\includegraphics[width=\maxwidth{56.196688409433015em}]{figure_1.eps}
+\end{center}
+
+\matlabheading{Effect of Users Weight On RAT Selection for Criterion 2}
+
+\begin{matlabcode}
+RAT1 = 0; %RAT1 Load
+RAT2 = 0;%RAT2 Load
+RAT3 = 0; %RAT3 Load
+
+for i = 1:row
+    if s2(i,1) == max(s2(i,:))
+        RAT1 = RAT1 +1;
+    elseif s2(i,2)== max(s2(i,:))
+        RAT2 = RAT2 +1;
+    else
+        RAT3 = RAT3 +1;
+    end
+end
+
+disp('Effect of User Weights For Criterion 2')
+\end{matlabcode}
+\begin{matlaboutput}
+Effect of User Weights For Criterion 2
+\end{matlaboutput}
+\begin{matlabcode}
+RATnames= categorical({'3G', 'WLAN', '5G'});
+RATnames= reordercats(RATnames,{'3G', 'WLAN', '5G'});
+y = [RAT1 RAT2 RAT3];
+bar(RATnames, y)
+\end{matlabcode}
+\begin{center}
+\includegraphics[width=\maxwidth{56.196688409433015em}]{figure_2.eps}
+\end{center}
+
+\matlabheading{Effect of Users Weight On RAT Selection for Criterion 3}
+
+\begin{matlabcode}
+RAT1 = 0; %RAT1 Load
+RAT2 = 0;%RAT2 Load
+RAT3 = 0; %RAT3 Load
+
+for i = 1:row
+    if s3(i,1) == max(s3(i,:))
+        RAT1 = RAT1 +1;
+    elseif s3(i,2)== max(s3(i,:))
+        RAT2 = RAT2 +1;
+    else
+        RAT3 = RAT3 +1;
+    end
+end
+
+disp('Effect of Users Weight On RAT Selection for Criterion 3')
+\end{matlabcode}
+\begin{matlaboutput}
+Effect of Users Weight On RAT Selection for Criterion 3
+\end{matlaboutput}
+\begin{matlabcode}
+RATnames= categorical({'3G', 'WLAN', '5G'});
+RATnames= reordercats(RATnames,{'3G', 'WLAN', '5G'});
+y = [RAT1 RAT2 RAT3];
+bar(RATnames, y)
+\end{matlabcode}
+\begin{center}
+\includegraphics[width=\maxwidth{56.196688409433015em}]{figure_3.eps}
+\end{center}
+
+\vspace{1em}
+
+\end{document}
